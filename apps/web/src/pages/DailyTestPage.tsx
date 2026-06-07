@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { getDailyTest, getFable, submitDailyTest } from "../api/client";
 import { ErrorPanel } from "../components/ErrorPanel";
 import { Loader } from "../components/Loader";
-import { Sparkline } from "../components/Sparkline";
+import { DailyChart } from "../components/DailyChart";
 import { useAsyncData } from "../hooks/useAsyncData";
 
 export function DailyTestPage() {
@@ -135,7 +135,7 @@ function DailyCurve({ status }: { status: DailyTestResult["status"] }) {
   return (
     <div className="daily-curve">
       <p className="kicker">Ta progression</p>
-      <Sparkline points={status.history} />
+      <DailyChart status={status} />
       <div className="memo-card__meta">
         <span>Meilleur : {status.best}%</span>
         <span>
