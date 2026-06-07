@@ -9,6 +9,7 @@
     "dev": "concurrently -n api,web -c blue,yellow \"pnpm --filter @la-fontaine/api dev\" \"pnpm --filter @la-fontaine/web dev\"",
     "import:fables": "pnpm --filter @la-fontaine/api import:fables",
     "import:texts": "pnpm --filter @la-fontaine/api import:texts",
+    "import:wikisource": "pnpm --filter @la-fontaine/api import:wikisource",
     "build": "pnpm --filter @la-fontaine/api build && pnpm --filter @la-fontaine/web build",
     "start": "pnpm --filter @la-fontaine/api start",
     "test": "pnpm --filter @la-fontaine/api test",

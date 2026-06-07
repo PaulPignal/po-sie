@@ -1,0 +1,37 @@
+[
+  {
+    "url": "https://fr.wikisource.org/wiki/Po%C3%A8mes_saturniens_(1902)/Chanson_d%E2%80%99automne",
+    "title": "Chanson d'automne",
+    "kind": "poeme",
+    "author": "Paul Verlaine",
+    "collection": "Poèmes saturniens"
+  },
+  {
+    "url": "https://fr.wikisource.org/wiki/Les_Fleurs_du_mal_(1861)/L%E2%80%99Albatros",
+    "title": "L'Albatros",
+    "kind": "poeme",
+    "author": "Charles Baudelaire",
+    "collection": "Les Fleurs du mal"
+  },
+  {
+    "url": "https://fr.wikisource.org/wiki/Po%C3%A9sies_(Rimbaud)/%C3%A9d._Vanier,_1895/Le_Dormeur_du_val",
+    "title": "Le Dormeur du val",
+    "kind": "poeme",
+    "author": "Arthur Rimbaud",
+    "collection": "Poésies (Rimbaud)"
+  },
+  {
+    "url": "https://fr.wikisource.org/wiki/Alcools/Le_Pont_Mirabeau",
+    "title": "Le Pont Mirabeau",
+    "kind": "poeme",
+    "author": "Guillaume Apollinaire",
+    "collection": "Alcools"
+  },
+  {
+    "url": "https://fr.wikisource.org/wiki/Les_Contemplations/%C2%AB_Demain,_d%C3%A8s_l%E2%80%99aube,_%C3%A0_l%E2%80%99heure_o%C3%B9_blanchit_la_campagne_%C2%BB",
+    "title": "Demain, dès l'aube",
+    "kind": "poeme",
+    "author": "Victor Hugo",
+    "collection": "Les Contemplations"
+  }
+]
