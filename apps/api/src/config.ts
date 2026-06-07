@@ -10,6 +10,8 @@ export interface AppConfig {
   sourceIndexUrl: string;
   importReportPath: string;
   webDistPath: string;
+  basicAuthUser?: string;
+  basicAuthPass?: string;
 }
 
 function modulePath(relativePath: string) {
@@ -28,6 +30,8 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     path.join(dataDir, "la-fontaine.sqlite");
   const importReportPath = overrides.importReportPath ?? path.join(dataDir, "import-report.json");
   const webDistPath = overrides.webDistPath ?? modulePath("../../web/dist");
+  const basicAuthUser = overrides.basicAuthUser ?? process.env.BASIC_AUTH_USER;
+  const basicAuthPass = overrides.basicAuthPass ?? process.env.BASIC_AUTH_PASS;
 
   fs.mkdirSync(dataDir, { recursive: true });
 
@@ -41,6 +45,8 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
       process.env.SOURCE_INDEX_URL ??
       "https://fr.wikisource.org/wiki/Fables_de_La_Fontaine_(%C3%A9d._1874)",
     importReportPath,
-    webDistPath
+    webDistPath,
+    ...(basicAuthUser ? { basicAuthUser } : {}),
+    ...(basicAuthPass ? { basicAuthPass } : {})
   };
 }

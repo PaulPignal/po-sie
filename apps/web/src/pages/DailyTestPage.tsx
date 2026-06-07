@@ -19,7 +19,7 @@ export function DailyTestPage() {
   }, [slug]);
 
   if (!slug) {
-    return <ErrorPanel message="Fable introuvable." />;
+    return <ErrorPanel message="Texte introuvable." />;
   }
   if (loading) {
     return <Loader label="Préparation du test…" />;
@@ -51,10 +51,10 @@ export function DailyTestPage() {
         <div>
           <p className="kicker">Test du jour</p>
           <h2>{fable.title}</h2>
-          <p>Récite la fable de mémoire, sans regarder le texte. On mesure ce que tu retrouves.</p>
+          <p>Récite le texte de mémoire, sans le regarder. On mesure ce que tu retrouves.</p>
         </div>
         <Link className="button button--ghost" to="/">
-          Retour à ma fable
+          Retour à l’accueil
         </Link>
       </section>
 
@@ -67,7 +67,7 @@ export function DailyTestPage() {
             </div>
           </div>
           {result.mastered ? (
-            <p className="memo-card__badge">🎉 Tu connais cette fable par cœur. Continue à l’entretenir un jour sur deux.</p>
+            <p className="memo-card__badge">🎉 Tu connais ce texte par cœur. Continue à l’entretenir un jour sur deux.</p>
           ) : result.isBestToday ? (
             <p>C’est ton meilleur score aujourd’hui. Reviens demain pour voir si ça tient.</p>
           ) : (

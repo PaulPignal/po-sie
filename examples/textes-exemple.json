@@ -1,0 +1,20 @@
+{
+  "entries": [
+    {
+      "kind": "poeme",
+      "author": "Paul Verlaine",
+      "collection": "Poèmes saturniens",
+      "title": "Chanson d'automne",
+      "sourceUrl": "https://fr.wikisource.org/wiki/Chanson_d%27automne",
+      "text": "Les sanglots longs\nDes violons\nDe l'automne\nBlessent mon cœur\nD'une langueur\nMonotone.\n\nTout suffocant\nEt blême, quand\nSonne l'heure,\nJe me souviens\nDes jours anciens\nEt je pleure ;\n\nEt je m'en vais\nAu vent mauvais\nQui m'emporte\nDeçà, delà,\nPareil à la\nFeuille morte."
+    },
+    {
+      "kind": "psaume",
+      "author": "Traduction Louis Segond (1910)",
+      "collection": "Psaumes",
+      "title": "Psaume 23",
+      "sourceUrl": "https://fr.wikisource.org/wiki/Bible_Segond_1910/Livre_des_Psaumes",
+      "text": "L'Éternel est mon berger : je ne manquerai de rien.\nIl me fait reposer dans de verts pâturages,\nIl me dirige près des eaux paisibles.\n\nIl restaure mon âme,\nIl me conduit dans les sentiers de la justice,\nÀ cause de son nom.\n\nQuand je marche dans la vallée de l'ombre de la mort,\nJe ne crains aucun mal, car tu es avec moi :\nTa houlette et ton bâton me rassurent."
+    }
+  ]
+}

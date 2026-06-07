@@ -5,6 +5,7 @@ import { EmptyState } from "../components/EmptyState";
 import { ErrorPanel } from "../components/ErrorPanel";
 import { Loader } from "../components/Loader";
 import { StatusBadge } from "../components/StatusBadge";
+import { kindFilterOptions, kindLabel } from "../content";
 import { useFocus } from "../focus/FocusContext";
 import { useAsyncData } from "../hooks/useAsyncData";
 
@@ -12,6 +13,7 @@ export function ChooseFablePage() {
   const { slug: current, choose } = useFocus();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
+  const [kind, setKind] = useState("tous");
   const [length, setLength] = useState("toutes");
   const [sort, setSort] = useState("plus_courte");
   const deferredQuery = useDeferredValue(query);
@@ -20,10 +22,11 @@ export function ChooseFablePage() {
     () =>
       getFables({
         query: deferredQuery,
+        kind: kind as never,
         length: length as never,
         sort: sort as never
       }),
-    [deferredQuery, length, sort]
+    [deferredQuery, kind, length, sort]
   );
 
   const pick = (slug: string) => {
@@ -35,9 +38,9 @@ export function ChooseFablePage() {
     <div className="page-stack">
       <section className="panel filters">
         <div className="panel__header">
-          <h2>Choisir une fable</h2>
+          <h2>Choisir un texte</h2>
         </div>
-        <p>Choisis-en une seule pour commencer. Les plus courtes sont les plus faciles à apprendre en premier.</p>
+        <p>Choisis-en un seul pour commencer. Les plus courts sont les plus faciles à apprendre en premier.</p>
         <div className="filters__grid">
           <label className="field">
             <span>Rechercher</span>
@@ -46,6 +49,16 @@ export function ChooseFablePage() {
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Ex. Le Corbeau et le Renard"
             />
+          </label>
+          <label className="field">
+            <span>Genre</span>
+            <select value={kind} onChange={(event) => setKind(event.target.value)}>
+              {kindFilterOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </label>
           <label className="field">
             <span>Longueur</span>
@@ -67,10 +80,10 @@ export function ChooseFablePage() {
         </div>
       </section>
 
-      {loading ? <Loader label="Chargement des fables…" /> : null}
+      {loading ? <Loader label="Chargement des textes…" /> : null}
       {error ? <ErrorPanel message={error} onRetry={reload} /> : null}
       {!loading && !error && data?.length === 0 ? (
-        <EmptyState title="Aucune fable trouvée" description="Essaie un autre mot ou enlève les filtres." />
+        <EmptyState title="Aucun texte trouvé" description="Essaie un autre mot ou enlève les filtres." />
       ) : null}
       {!loading && !error ? (
         <section className="cards-grid">
@@ -86,7 +99,7 @@ export function ChooseFablePage() {
                 <div className="fable-card__head">
                   <div>
                     <p className="kicker">
-                      {fable.bookLabel} · fable {fable.itemNumber}
+                      {fable.bookLabel} · {fable.author ?? kindLabel[fable.kind]}
                     </p>
                     <h3>{fable.title}</h3>
                   </div>

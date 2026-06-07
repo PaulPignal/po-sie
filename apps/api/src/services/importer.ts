@@ -254,6 +254,8 @@ export function parseFablePageHtml(html: string, entry: ImportEntry): ImportedFa
   return {
     slug: entry.slug,
     title: entry.title,
+    kind: "fable",
+    author: "Jean de La Fontaine",
     bookNumber: entry.bookNumber,
     bookLabel: entry.bookLabel,
     itemNumber: entry.itemNumber,

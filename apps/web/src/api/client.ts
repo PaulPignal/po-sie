@@ -38,6 +38,7 @@ export function getReviewQueue(limit = 8) {
 export function getFables(filters: FableFilters) {
   const params = new URLSearchParams();
   if (filters.query) params.set("query", filters.query);
+  if (filters.kind) params.set("kind", filters.kind);
   if (filters.status) params.set("status", filters.status);
   if (filters.difficulty) params.set("difficulty", filters.difficulty);
   if (filters.length) params.set("length", filters.length);

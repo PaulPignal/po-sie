@@ -11,13 +11,13 @@ export function FableDetailPage() {
   const { data, error, loading, reload } = useAsyncData(() => getFable(slug ?? ""), [slug]);
 
   if (!slug) {
-    return <EmptyState title="Fable absente" description="Reviens à l’accueil pour choisir une fable." actionLabel="Accueil" actionTo="/" />;
+    return <EmptyState title="Texte absent" description="Reviens à l’accueil pour choisir un texte." actionLabel="Accueil" actionTo="/" />;
   }
   if (loading) {
     return <Loader label="Chargement du texte…" />;
   }
   if (error || !data) {
-    return <ErrorPanel message={error ?? "Impossible de charger la fable."} onRetry={reload} />;
+    return <ErrorPanel message={error ?? "Impossible de charger le texte."} onRetry={reload} />;
   }
 
   return (
@@ -25,7 +25,8 @@ export function FableDetailPage() {
       <section className="panel hero">
         <div>
           <p className="kicker">
-            {data.bookLabel} · fable {data.itemNumber}
+            {data.bookLabel}
+            {data.author ? ` · ${data.author}` : ""}
           </p>
           <h2>{data.title}</h2>
           <div className="meta-inline">
@@ -37,7 +38,7 @@ export function FableDetailPage() {
         </div>
         <div className="hero__actions">
           <Link className="button button--ghost" to="/">
-            Retour à ma fable
+            Retour à l’accueil
           </Link>
           <Link className="button" to={`/fables/${data.slug}/practice/lecture-active`}>
             M’entraîner
@@ -50,9 +51,11 @@ export function FableDetailPage() {
           <h2>Le texte</h2>
         </div>
         <pre>{data.text}</pre>
-        <a className="button button--ghost" href={data.sourceUrl} rel="noreferrer" target="_blank">
-          Voir la source (Wikisource)
-        </a>
+        {data.sourceUrl.startsWith("http") ? (
+          <a className="button button--ghost" href={data.sourceUrl} rel="noreferrer" target="_blank">
+            Voir la source
+          </a>
+        ) : null}
       </section>
     </div>
   );

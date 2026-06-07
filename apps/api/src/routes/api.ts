@@ -29,6 +29,7 @@ export async function registerApiRoutes(app: FastifyInstance) {
     const query = request.query as Record<string, string | undefined>;
     const filters = {
       ...(query.query ? { query: query.query } : {}),
+      kind: (query.kind as never) ?? "tous",
       status: (query.status as never) ?? "tous",
       difficulty: (query.difficulty as never) ?? "toutes",
       length: (query.length as never) ?? "toutes",
