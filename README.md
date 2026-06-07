@@ -63,6 +63,26 @@ pnpm import:texts examples/textes-exemple.json
 `kind` ∈ `fable | psaume | poeme | texte`. Les strophes se séparent par une ligne vide.
 Les textes apparaissent dans le sélecteur, filtrables par genre.
 
+Pour du texte **exact** sans le recopier, importe directement depuis des pages
+Wikisource (réutilise le parsing éprouvé sur les fables). Liste curatée d'exemple :
+[`examples/poesie-wikisource.json`](examples/poesie-wikisource.json) (Verlaine, Baudelaire,
+Rimbaud, Apollinaire, Hugo) :
+
+```bash
+pnpm import:wikisource examples/poesie-wikisource.json
+```
+
+Chaque entrée = `{ "url", "title", "kind", "author", "collection" }`.
+
+**Psaumes** : le Psautier Wikisource (Segond 1910) est une seule page ; un découpeur
+dédié en extrait les psaumes individuels (les numéros de versets sont des `<sup>`, donc
+absents du texte). Config d'exemple [`examples/psaumes.json`](examples/psaumes.json)
+(sélection de psaumes ; `"psalms": []` ou absent ⇒ les 150) :
+
+```bash
+pnpm import:psaumes examples/psaumes.json
+```
+
 ## Déploiement cloud (optionnel)
 
 Une image Docker est fournie. SQLite a besoin d'un **disque persistant** : monte un
@@ -98,5 +118,7 @@ volume déjà peuplé.
 | `pnpm start` | Sert l'app compilée (prod). |
 | `pnpm import:fables [--force]` | Importe/rafraîchit les fables (Wikisource). |
 | `pnpm import:texts <manifest.json>` | Importe des textes locaux (psaumes, poésie…). |
+| `pnpm import:wikisource <liste.json>` | Importe des pages Wikisource par URL (texte exact). |
+| `pnpm import:psaumes <config.json>` | Importe une sélection de psaumes (Psautier Segond découpé). |
 | `pnpm test` | Tests (Vitest, côté API). |
 | `pnpm typecheck` | Typecheck API + web. |

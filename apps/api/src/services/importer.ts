@@ -15,6 +15,9 @@ import {
   splitVerses
 } from "../utils/text";
 import { countFables, ImportedFableRecord, upsertImportedFable } from "./store";
+import type { ContentKind } from "@la-fontaine/shared";
+import { importTextManifest } from "./textImporter";
+import type { TextImportSummary, TextManifestEntry } from "./textImporter";
 
 const USER_AGENT = "LaFontaineLocalApp/1.0 (+local learning app)";
 const REQUEST_DELAY_MS = 350;
@@ -191,7 +194,8 @@ export function parseIndexHtml(html: string, sourceIndexUrl: string): ImportEntr
   return entries;
 }
 
-export function parseFablePageHtml(html: string, entry: ImportEntry): ImportedFableRecord {
+// Cœur du parsing d'une page Wikisource, réutilisable pour tout texte (pas que les fables).
+export function extractWikisourceText(html: string, title: string): string {
   const $ = load(html);
   const root = getContentRoot($).clone();
   root
@@ -229,14 +233,14 @@ export function parseFablePageHtml(html: string, entry: ImportEntry): ImportedFa
     }
   });
 
-  const normalizedTitle = normalizeComparison(entry.title);
+  const normalizedTitle = normalizeComparison(title);
   const titleIndex = blocks.findIndex((block) => normalizeComparison(block) === normalizedTitle);
   const contentBlocks = blocks
     .slice(titleIndex >= 0 ? titleIndex + 1 : 0)
     .filter((block) => !shouldSkipContentBlock(block));
 
   if (contentBlocks.length === 0) {
-    throw new Error(`Impossible d’extraire le texte de ${entry.title}`);
+    throw new Error(`Impossible d’extraire le texte de ${title}`);
   }
 
   const cleanedBlocks = contentBlocks
@@ -247,7 +251,11 @@ export function parseFablePageHtml(html: string, entry: ImportEntry): ImportedFa
     )
     .filter(Boolean);
 
-  const text = stripLeadingTitle(cleanWhitespace(cleanedBlocks.join("\n\n")), entry.title);
+  return stripLeadingTitle(cleanWhitespace(cleanedBlocks.join("\n\n")), title);
+}
+
+export function parseFablePageHtml(html: string, entry: ImportEntry): ImportedFableRecord {
+  const text = extractWikisourceText(html, entry.title);
   const verses = splitVerses(text);
   const wordCount = countWords(text);
 
@@ -270,7 +278,127 @@ export function parseFablePageHtml(html: string, entry: ImportEntry): ImportedFa
   };
 }
 
-async function fetchHtml(url: string, attempt = 0): Promise<string> {
+export interface WikisourceImportEntry {
+  url: string;
+  title: string;
+  kind?: ContentKind;
+  author?: string | null;
+  collection?: string;
+}
+
+// Importe une liste curatée de pages Wikisource (par URL) : on réutilise le parsing
+// éprouvé sur les fables pour obtenir un texte propre, puis le même pipeline d'upsert
+// que l'import local. Ce n'est PAS un scraper d'index (fragile) — juste des URLs choisies.
+export async function importWikisourceList(
+  db: DatabaseSync,
+  list: WikisourceImportEntry[]
+): Promise<TextImportSummary> {
+  const entries: TextManifestEntry[] = [];
+  const fetchErrors: TextImportSummary["errors"] = [];
+
+  for (const [index, item] of list.entries()) {
+    if (index > 0) {
+      await sleep(REQUEST_DELAY_MS);
+    }
+    try {
+      const html = await fetchHtml(item.url);
+      const text = extractWikisourceText(html, item.title);
+      entries.push({
+        title: item.title,
+        text,
+        sourceUrl: item.url,
+        ...(item.kind ? { kind: item.kind } : {}),
+        ...(item.author !== undefined ? { author: item.author } : {}),
+        ...(item.collection ? { collection: item.collection } : {})
+      });
+    } catch (error) {
+      fetchErrors.push({
+        title: item.title,
+        message: error instanceof Error ? error.message : "Erreur de récupération"
+      });
+    }
+  }
+
+  const summary = importTextManifest(db, { entries });
+  summary.discovered = list.length;
+  summary.failed += fetchErrors.length;
+  summary.errors.push(...fetchErrors);
+  return summary;
+}
+
+export interface PsalterEntry {
+  number: number;
+  title: string;
+  text: string;
+}
+
+// Le Psautier Wikisource (Segond) est une seule page ; chaque psaume est délimité par
+// une ligne « Psaume N ». On découpe dessus pour obtenir des textes individuels.
+// (Les numéros de versets sont des <sup>, déjà retirés par extractWikisourceText.)
+export function splitPsalter(fullText: string): PsalterEntry[] {
+  const heading = /^Psaume\s+(\d+)\s*$/;
+  const psalms: PsalterEntry[] = [];
+  let current: { number: number; lines: string[] } | null = null;
+
+  const flush = () => {
+    if (current) {
+      const text = current.lines.join("\n").trim();
+      if (text) {
+        psalms.push({ number: current.number, title: `Psaume ${current.number}`, text });
+      }
+    }
+  };
+
+  for (const line of fullText.split("\n")) {
+    const match = line.match(heading);
+    if (match) {
+      flush();
+      current = { number: Number(match[1]), lines: [] };
+      continue;
+    }
+    if (current) {
+      current.lines.push(line);
+    }
+  }
+  flush();
+  return psalms;
+}
+
+export interface PsalterImportConfig {
+  url: string;
+  author?: string | null;
+  collection?: string;
+  psalms?: number[];
+}
+
+// Importe une sélection de psaumes depuis la page du Psautier : une seule requête,
+// puis découpage local en psaumes individuels (vide `psalms` => tous).
+export async function importPsalter(
+  db: DatabaseSync,
+  config: PsalterImportConfig
+): Promise<TextImportSummary> {
+  const html = await fetchHtml(config.url);
+  const full = extractWikisourceText(html, "Livre des Psaumes");
+  const wanted = config.psalms && config.psalms.length > 0 ? new Set(config.psalms) : null;
+  const selected = splitPsalter(full)
+    .filter((psalm) => !wanted || wanted.has(psalm.number))
+    .sort((a, b) => a.number - b.number);
+
+  const entries: TextManifestEntry[] = selected.map((psalm) => ({
+    title: psalm.title,
+    text: psalm.text,
+    kind: "psaume",
+    collection: config.collection ?? "Psaumes",
+    sourceUrl: config.url,
+    ...(config.author !== undefined ? { author: config.author } : {})
+  }));
+
+  const summary = importTextManifest(db, { entries });
+  summary.discovered = entries.length;
+  return summary;
+}
+
+export async function fetchHtml(url: string, attempt = 0): Promise<string> {
   const response = await fetch(url, {
     headers: {
       "user-agent": USER_AGENT
@@ -373,6 +501,8 @@ function shouldSkipLine(line: string) {
     /^►/.test(line) ||
     /^collection/i.test(line) ||
     /^La Fontaine - Fables, Bernardin-Bechet, 1874\.djvu/i.test(line) ||
-    /^p\.\s*\d+/i.test(line)
+    /^p\.\s*\d+/i.test(line) ||
+    // Signature de date en fin de poème (ex. « 7 octobre 1870. ») — pas un vers à réciter.
+    /^\d{1,2}\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+\d{4}/i.test(line)
   );
 }

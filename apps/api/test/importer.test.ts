@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { parseFablePageHtml, parseIndexHtml } from "../src/services/importer";
+import { extractWikisourceText, parseFablePageHtml, parseIndexHtml, splitPsalter } from "../src/services/importer";
 
 const fixturesDir = path.join(process.cwd(), "test", "fixtures");
 
@@ -173,5 +173,56 @@ describe("importer", () => {
     expect(parsed.text).not.toContain("Jean de La Fontaine");
     expect(parsed.text).not.toContain("Le Pot de terre et le Pot de fer");
     expect(parsed.text).not.toContain("La Fontaine - Fables, Bernardin-Bechet, 1874.djvu");
+  });
+
+  it("extractWikisourceText extrait un poème générique (hors fable) sans le titre", () => {
+    const html = `
+      <!doctype html>
+      <html lang="fr">
+        <body>
+          <div id="mw-content-text">
+            <div class="mw-parser-output">
+              <div class="prp-pages-output">
+                <div class="poem verse">
+                  <p>
+                    CHANSON D'AUTOMNE<br />
+                    <br />
+                    Les sanglots longs<br />
+                    Des violons<br />
+                    De l'automne
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const text = extractWikisourceText(html, "Chanson d'automne");
+    expect(text.startsWith("Les sanglots longs")).toBe(true);
+    expect(text).not.toContain("CHANSON D'AUTOMNE");
+    expect(text.split("\n")).toHaveLength(3);
+  });
+
+  it("splitPsalter découpe le Psautier sur les en-têtes « Psaume N »", () => {
+    const text = [
+      "Psaume 1",
+      "",
+      "Heureux l'homme qui ne marche pas",
+      "selon le conseil des méchants !",
+      "Psaume 2",
+      "Pourquoi ce tumulte parmi les nations,",
+      "Psaume 23",
+      "Cantique de David.",
+      "L'Éternel est mon berger : je ne manquerai de rien."
+    ].join("\n");
+
+    const psalms = splitPsalter(text);
+    expect(psalms.map((psalm) => psalm.number)).toEqual([1, 2, 23]);
+    expect(psalms[0]?.title).toBe("Psaume 1");
+    expect(psalms[0]?.text).toContain("Heureux l'homme");
+    expect(psalms[0]?.text).not.toContain("Psaume 2");
+    expect(psalms[2]?.text.startsWith("Cantique de David.")).toBe(true);
   });
 });
