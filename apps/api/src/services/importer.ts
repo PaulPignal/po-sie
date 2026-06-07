@@ -326,6 +326,78 @@ export async function importWikisourceList(
   return summary;
 }
 
+export interface PsalterEntry {
+  number: number;
+  title: string;
+  text: string;
+}
+
+// Le Psautier Wikisource (Segond) est une seule page ; chaque psaume est délimité par
+// une ligne « Psaume N ». On découpe dessus pour obtenir des textes individuels.
+// (Les numéros de versets sont des <sup>, déjà retirés par extractWikisourceText.)
+export function splitPsalter(fullText: string): PsalterEntry[] {
+  const heading = /^Psaume\s+(\d+)\s*$/;
+  const psalms: PsalterEntry[] = [];
+  let current: { number: number; lines: string[] } | null = null;
+
+  const flush = () => {
+    if (current) {
+      const text = current.lines.join("\n").trim();
+      if (text) {
+        psalms.push({ number: current.number, title: `Psaume ${current.number}`, text });
+      }
+    }
+  };
+
+  for (const line of fullText.split("\n")) {
+    const match = line.match(heading);
+    if (match) {
+      flush();
+      current = { number: Number(match[1]), lines: [] };
+      continue;
+    }
+    if (current) {
+      current.lines.push(line);
+    }
+  }
+  flush();
+  return psalms;
+}
+
+export interface PsalterImportConfig {
+  url: string;
+  author?: string | null;
+  collection?: string;
+  psalms?: number[];
+}
+
+// Importe une sélection de psaumes depuis la page du Psautier : une seule requête,
+// puis découpage local en psaumes individuels (vide `psalms` => tous).
+export async function importPsalter(
+  db: DatabaseSync,
+  config: PsalterImportConfig
+): Promise<TextImportSummary> {
+  const html = await fetchHtml(config.url);
+  const full = extractWikisourceText(html, "Livre des Psaumes");
+  const wanted = config.psalms && config.psalms.length > 0 ? new Set(config.psalms) : null;
+  const selected = splitPsalter(full)
+    .filter((psalm) => !wanted || wanted.has(psalm.number))
+    .sort((a, b) => a.number - b.number);
+
+  const entries: TextManifestEntry[] = selected.map((psalm) => ({
+    title: psalm.title,
+    text: psalm.text,
+    kind: "psaume",
+    collection: config.collection ?? "Psaumes",
+    sourceUrl: config.url,
+    ...(config.author !== undefined ? { author: config.author } : {})
+  }));
+
+  const summary = importTextManifest(db, { entries });
+  summary.discovered = entries.length;
+  return summary;
+}
+
 export async function fetchHtml(url: string, attempt = 0): Promise<string> {
   const response = await fetch(url, {
     headers: {
