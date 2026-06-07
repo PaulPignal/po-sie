@@ -561,3 +561,256 @@ pre {
   }
 }
 
+/* (a) Texte à trous — champs EN PLACE dans le vers */
+.cloze-text {
+  display: grid;
+  gap: 4px;
+  line-height: 2.2;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+}
+
+.cloze-line {
+  margin: 0;
+  color: var(--text) !important;
+}
+
+.cloze-slot {
+  white-space: nowrap;
+}
+
+.cloze-blank {
+  display: inline-block;
+  min-width: 4ch;
+  margin: 0 3px;
+  padding: 1px 6px;
+  border: none;
+  border-bottom: 2px solid var(--accent);
+  border-radius: 7px 7px 2px 2px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+  text-align: center;
+  vertical-align: baseline;
+}
+
+.cloze-blank::placeholder {
+  color: rgba(115, 97, 79, 0.55);
+  letter-spacing: 0.04em;
+}
+
+.cloze-blank:focus {
+  outline: none;
+  border-bottom-color: var(--text);
+  background: #fff;
+}
+
+.cloze-blank--correct {
+  border-bottom-color: var(--green);
+  background: rgba(83, 120, 90, 0.14);
+  color: var(--green);
+}
+
+.cloze-blank--wrong {
+  border-bottom-color: var(--red);
+  background: rgba(181, 75, 63, 0.1);
+  color: var(--red);
+}
+
+.cloze-answer {
+  margin-left: 4px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: rgba(83, 120, 90, 0.16);
+  color: var(--green);
+  font-family: var(--sans);
+  font-size: 0.9em;
+}
+
+/* (b) Remise-en-ordre — glisser-déposer */
+.reorder-item__body {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+.reorder-item__text {
+  min-width: 0;
+}
+
+.reorder-handle {
+  flex: none;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--muted);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.reorder-handle:active {
+  cursor: grabbing;
+}
+
+.reorder-handle:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.reorder-item--dragging {
+  pointer-events: none;
+  border-style: solid;
+  border-color: var(--accent);
+  box-shadow: 0 18px 40px rgba(87, 61, 40, 0.22);
+  transform: scale(1.012);
+  user-select: none;
+}
+
+.reorder-pin {
+  color: var(--accent);
+}
+
+/* (c) Courbe quotidienne enrichie */
+.daily-chart {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  font-family: var(--sans);
+}
+
+.daily-chart__grid {
+  stroke: rgba(115, 97, 79, 0.14);
+  stroke-width: 1;
+}
+
+.daily-chart__ylabel {
+  fill: var(--muted);
+  font-size: 9px;
+}
+
+.daily-chart__threshold {
+  stroke: var(--green);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 3;
+  opacity: 0.8;
+}
+
+.daily-chart__threshold-label {
+  fill: var(--green);
+  font-size: 8.5px;
+  font-weight: 600;
+}
+
+.daily-chart__today-callout {
+  fill: var(--accent);
+  font-size: 8.5px;
+  font-weight: 700;
+}
+
+.daily-chart__line {
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.daily-chart__dot {
+  fill: var(--accent);
+}
+
+.daily-chart__dot--mastered {
+  fill: var(--green);
+}
+
+.daily-chart__today-ring {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  opacity: 0.5;
+}
+
+.daily-chart__today-guide {
+  stroke: var(--accent);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.4;
+}
+
+.daily-chart__xlabel {
+  fill: var(--muted);
+  font-size: 9px;
+}
+
+.daily-chart__xlabel--today {
+  fill: var(--accent);
+  font-weight: 700;
+}
+
+/* (d) Progression par passage */
+.passage-list {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.passage-card {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--panel-strong);
+}
+
+.passage-card__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.passage-card__head strong {
+  display: block;
+  font-family: var(--serif);
+}
+
+.passage-card__range {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.passage-card__cue {
+  margin: 0;
+  font-family: var(--serif);
+  color: var(--text) !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.passage-card__bar {
+  display: grid;
+  gap: 6px;
+}
+
+.passage-card__meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.passage-card .button {
+  justify-self: start;
+}
+

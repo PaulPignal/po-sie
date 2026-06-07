@@ -4,6 +4,7 @@ import { getDailyTest, getFable } from "../api/client";
 import { EmptyState } from "../components/EmptyState";
 import { ErrorPanel } from "../components/ErrorPanel";
 import { Loader } from "../components/Loader";
+import { PassageProgress } from "../components/PassageProgress";
 import { Sparkline } from "../components/Sparkline";
 import { exerciseMeta } from "../exercises/meta";
 import { useFocus } from "../focus/FocusContext";
@@ -104,6 +105,8 @@ export function HomePage() {
           )}
         </article>
       </section>
+
+      <PassageProgress fable={fable} slug={slug} />
 
       <section className="panel">
         <div className="panel__header">
