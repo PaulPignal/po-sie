@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsup src/server.ts src/cli/import-fables.ts src/cli/import-texts.ts src/cli/import-wikisource.ts --format esm --platform node --out-dir dist --clean --splitting false",
+    "build": "tsup src/server.ts src/cli/import-fables.ts src/cli/import-texts.ts src/cli/import-wikisource.ts src/cli/import-psaumes.ts --format esm --platform node --out-dir dist --clean --splitting false",
     "start": "node --disable-warning=ExperimentalWarning --import tsx src/server.ts",
     "import:fables": "tsx src/cli/import-fables.ts",
     "import:texts": "tsx src/cli/import-texts.ts",
     "import:wikisource": "tsx src/cli/import-wikisource.ts",
+    "import:psaumes": "tsx src/cli/import-psaumes.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

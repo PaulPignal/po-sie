@@ -10,6 +10,7 @@
     "import:fables": "pnpm --filter @la-fontaine/api import:fables",
     "import:texts": "pnpm --filter @la-fontaine/api import:texts",
     "import:wikisource": "pnpm --filter @la-fontaine/api import:wikisource",
+    "import:psaumes": "pnpm --filter @la-fontaine/api import:psaumes",
     "build": "pnpm --filter @la-fontaine/api build && pnpm --filter @la-fontaine/web build",
     "start": "pnpm --filter @la-fontaine/api start",
     "test": "pnpm --filter @la-fontaine/api test",
