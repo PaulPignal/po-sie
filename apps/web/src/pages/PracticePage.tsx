@@ -100,7 +100,7 @@ export function PracticePage() {
         </div>
         <div className="hero__actions">
           <Link className="button button--ghost" to="/">
-            Retour à ma fable
+            Retour à l’accueil
           </Link>
           {result ? null : (
             <button className="button button--ghost" onClick={newDraw} type="button">

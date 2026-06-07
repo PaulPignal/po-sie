@@ -7,6 +7,7 @@ import { Loader } from "../components/Loader";
 import { PassageProgress } from "../components/PassageProgress";
 import { Sparkline } from "../components/Sparkline";
 import { exerciseMeta } from "../exercises/meta";
+import { kindLabel, kindPossessive } from "../content";
 import { useFocus } from "../focus/FocusContext";
 import { useAsyncData } from "../hooks/useAsyncData";
 
@@ -23,20 +24,20 @@ export function HomePage() {
   if (!slug) {
     return (
       <EmptyState
-        title="Choisis la fable que tu veux apprendre"
-        description="Tu en travailles une seule à la fois, un peu chaque jour, jusqu’à la connaître par cœur."
-        actionLabel="Choisir une fable"
+        title="Choisis le texte que tu veux apprendre"
+        description="Tu en travailles un seul à la fois, un peu chaque jour, jusqu’à le savoir par cœur."
+        actionLabel="Choisir un texte"
         actionTo="/choisir"
       />
     );
   }
 
   if (loading) {
-    return <Loader label="Chargement de ta fable…" />;
+    return <Loader label="Chargement de ton texte…" />;
   }
 
   if (error || !data) {
-    return <ErrorPanel message={error ?? "Impossible de charger ta fable."} onRetry={reload} />;
+    return <ErrorPanel message={error ?? "Impossible de charger ton texte."} onRetry={reload} />;
   }
 
   const { fable, daily } = data;
@@ -46,14 +47,17 @@ export function HomePage() {
     <div className="page-stack">
       <section className="panel hero">
         <div>
-          <p className="kicker">Ma fable du moment</p>
+          <p className="kicker">
+            {kindPossessive[fable.kind]} {kindLabel[fable.kind]} du moment
+          </p>
           <h2>{fable.title}</h2>
           <p>
-            {fable.bookLabel} · fable {fable.itemNumber} · {fable.verseCount} vers
+            {fable.bookLabel}
+            {fable.author ? ` · ${fable.author}` : ""} · {fable.verseCount} vers
           </p>
         </div>
         <Link className="button button--ghost" to="/choisir">
-          Changer de fable
+          Changer de texte
         </Link>
       </section>
 
@@ -62,7 +66,7 @@ export function HomePage() {
           <p className="kicker">Ce que tu retiens</p>
           {daily.daysPracticed === 0 ? (
             <>
-              <p className="memo-card__lead">Tu n’as pas encore fait de test sur cette fable.</p>
+              <p className="memo-card__lead">Tu n’as pas encore fait de test sur ce texte.</p>
               <p>Le test du jour mesure ce que tu sais réciter sans aide. Fais-en un pour démarrer ta courbe.</p>
             </>
           ) : (
@@ -97,7 +101,7 @@ export function HomePage() {
             </>
           ) : (
             <>
-              <p>Récite la fable de mémoire pour voir où tu en es. Une fois par jour suffit.</p>
+              <p>Récite le texte de mémoire pour voir où tu en es. Une fois par jour suffit.</p>
               <Link className="button" to={`/fables/${slug}/test`}>
                 Faire le test du jour
               </Link>
