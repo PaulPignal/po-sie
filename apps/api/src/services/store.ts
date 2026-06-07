@@ -1,4 +1,5 @@
 import type {
+  ContentKind,
   Difficulty,
   ExerciseResult,
   ExerciseStat,
@@ -27,6 +28,8 @@ import { formatVerseRangeLabel, recommendedSupportFromStage, splitVerses } from 
 export interface ImportedFableRecord {
   slug: string;
   title: string;
+  kind?: ContentKind;
+  author?: string | null;
   bookNumber: number;
   bookLabel: string;
   itemNumber: number;
@@ -72,11 +75,11 @@ export function upsertImportedFable(db: DatabaseSync, record: ImportedFableRecor
           INSERT INTO fables (
             slug, title, book_number, book_label, item_number, text, text_hash,
             verse_count, word_count, estimated_reading_minutes, difficulty,
-            source_url, imported_at, updated_at
+            kind, author, source_url, imported_at, updated_at
           ) VALUES (
             :slug, :title, :bookNumber, :bookLabel, :itemNumber, :text, :textHash,
             :verseCount, :wordCount, :estimatedReadingMinutes, :difficulty,
-            :sourceUrl, :importedAt, :updatedAt
+            :kind, :author, :sourceUrl, :importedAt, :updatedAt
           )
         `)
         .run({
@@ -108,6 +111,8 @@ export function upsertImportedFable(db: DatabaseSync, record: ImportedFableRecor
             word_count = :wordCount,
             estimated_reading_minutes = :estimatedReadingMinutes,
             difficulty = :difficulty,
+            kind = :kind,
+            author = :author,
             source_url = :sourceUrl,
             updated_at = :updatedAt
         WHERE id = :fableId
@@ -229,6 +234,11 @@ export function listFables(db: DatabaseSync, filters: FableFilters = {}): FableL
     params.status = filters.status;
   }
 
+  if (filters.kind && filters.kind !== "tous") {
+    clauses.push("f.kind = :kind");
+    params.kind = filters.kind;
+  }
+
   if (filters.difficulty && filters.difficulty !== "toutes") {
     clauses.push("f.difficulty = :difficulty");
     params.difficulty = filters.difficulty;
@@ -249,6 +259,8 @@ export function listFables(db: DatabaseSync, filters: FableFilters = {}): FableL
       SELECT
         f.slug,
         f.title,
+        f.kind,
+        f.author,
         f.book_number AS bookNumber,
         f.book_label AS bookLabel,
         f.item_number AS itemNumber,
@@ -275,6 +287,8 @@ export function listFables(db: DatabaseSync, filters: FableFilters = {}): FableL
   return rows.map((row) => ({
     slug: String(row.slug),
     title: String(row.title),
+    kind: (row.kind as ContentKind | null) ?? "fable",
+    author: (row.author as string | null) ?? null,
     bookNumber: Number(row.bookNumber),
     bookLabel: String(row.bookLabel),
     itemNumber: Number(row.itemNumber),
@@ -295,6 +309,8 @@ export function getFableDetail(db: DatabaseSync, slug: string): FableDetail | nu
         f.id,
         f.slug,
         f.title,
+        f.kind,
+        f.author,
         f.book_number AS bookNumber,
         f.book_label AS bookLabel,
         f.item_number AS itemNumber,
@@ -335,6 +351,8 @@ export function getFableDetail(db: DatabaseSync, slug: string): FableDetail | nu
   return {
     slug: String(row.slug),
     title: String(row.title),
+    kind: (row.kind as ContentKind | null) ?? "fable",
+    author: (row.author as string | null) ?? null,
     bookNumber: Number(row.bookNumber),
     bookLabel: String(row.bookLabel),
     itemNumber: Number(row.itemNumber),
@@ -1026,6 +1044,8 @@ function recordToSqlParams(record: ImportedFableRecord) {
   return {
     slug: record.slug,
     title: record.title,
+    kind: record.kind ?? "fable",
+    author: record.author ?? null,
     bookNumber: record.bookNumber,
     bookLabel: record.bookLabel,
     itemNumber: record.itemNumber,

@@ -8,6 +8,7 @@ export function createDatabase(databasePath: string) {
   db.exec("PRAGMA foreign_keys = ON;");
   db.exec("PRAGMA journal_mode = WAL;");
   ensureSchema(db);
+  migrateSchema(db);
   return db;
 }
 
@@ -26,6 +27,8 @@ function ensureSchema(db: DatabaseSync) {
       word_count INTEGER NOT NULL,
       estimated_reading_minutes INTEGER NOT NULL,
       difficulty TEXT NOT NULL,
+      kind TEXT NOT NULL DEFAULT 'fable',
+      author TEXT,
       source_url TEXT NOT NULL,
       imported_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
@@ -104,6 +107,24 @@ function ensureSchema(db: DatabaseSync) {
     CREATE INDEX IF NOT EXISTS idx_sessions_created_at ON exercise_sessions(created_at);
     CREATE INDEX IF NOT EXISTS idx_unit_progress_next_review_at ON unit_progress(next_review_at);
   `);
+}
+
+// Idempotent, additive migrations for databases created before a column existed.
+// Safe to run on every boot: each ALTER is guarded, and the backfill only touches NULLs.
+function migrateSchema(db: DatabaseSync) {
+  const columns = (db.prepare("PRAGMA table_info(fables)").all() as Array<{ name: string }>).map(
+    (column) => column.name
+  );
+
+  if (!columns.includes("kind")) {
+    db.exec("ALTER TABLE fables ADD COLUMN kind TEXT NOT NULL DEFAULT 'fable'");
+  }
+  if (!columns.includes("author")) {
+    db.exec("ALTER TABLE fables ADD COLUMN author TEXT");
+  }
+
+  // Every pre-migration row is a La Fontaine fable, so backfill its author once.
+  db.exec("UPDATE fables SET author = 'Jean de La Fontaine' WHERE author IS NULL AND kind = 'fable'");
 }
 
 export function inTransaction<T>(db: DatabaseSync, callback: () => T) {

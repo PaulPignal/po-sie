@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsup src/server.ts src/cli/import-fables.ts --format esm --platform node --out-dir dist --clean --splitting false",
+    "build": "tsup src/server.ts src/cli/import-fables.ts src/cli/import-texts.ts --format esm --platform node --out-dir dist --clean --splitting false",
     "start": "node --disable-warning=ExperimentalWarning --import tsx src/server.ts",
     "import:fables": "tsx src/cli/import-fables.ts",
+    "import:texts": "tsx src/cli/import-texts.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

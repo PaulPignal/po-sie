@@ -12,6 +12,11 @@ export const learningStatuses = ["jamais_vue", "en_cours", "maîtrisée"] as con
 
 export const difficulties = ["facile", "intermédiaire", "avancée"] as const;
 
+// Catalogue multi-genres : le moteur (unités, exercices, révision) est agnostique du
+// contenu ; `kind` ne sert qu'à l'étiquetage et à la copie UI.
+export const contentKinds = ["fable", "psaume", "poeme", "texte"] as const;
+export type ContentKind = (typeof contentKinds)[number];
+
 export type ExerciseType = (typeof exerciseTypes)[number];
 export type SupportLevel = (typeof supportLevels)[number];
 export type LearningStatus = (typeof learningStatuses)[number];
@@ -72,6 +77,8 @@ export interface ExerciseStat {
 export interface FableListItem {
   slug: string;
   title: string;
+  kind: ContentKind;
+  author: string | null;
   bookNumber: number;
   bookLabel: string;
   itemNumber: number;
@@ -87,6 +94,8 @@ export interface FableListItem {
 export interface FableDetail {
   slug: string;
   title: string;
+  kind: ContentKind;
+  author: string | null;
   bookNumber: number;
   bookLabel: string;
   itemNumber: number;
@@ -135,6 +144,7 @@ export interface DashboardSnapshot {
 
 export interface FableFilters {
   query?: string;
+  kind?: ContentKind | "tous";
   status?: LearningStatus | "tous";
   difficulty?: Difficulty | "toutes";
   length?: LengthFilter;
