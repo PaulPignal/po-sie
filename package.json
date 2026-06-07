@@ -1,0 +1,21 @@
+{
+  "name": "la-fontaine-local",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,yellow \"pnpm --filter @la-fontaine/api dev\" \"pnpm --filter @la-fontaine/web dev\"",
+    "import:fables": "pnpm --filter @la-fontaine/api import:fables",
+    "build": "pnpm --filter @la-fontaine/api build && pnpm --filter @la-fontaine/web build",
+    "start": "pnpm --filter @la-fontaine/api start",
+    "test": "pnpm --filter @la-fontaine/api test",
+    "typecheck": "pnpm --filter @la-fontaine/api typecheck && pnpm --filter @la-fontaine/web typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.8.2"
+  }
+}
+
