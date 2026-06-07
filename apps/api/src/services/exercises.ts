@@ -417,7 +417,8 @@ function buildCorrections(submission: ExerciseSubmission) {
         (expected) => `Mot attendu : ${expected}`
       );
     case "remise-en-ordre":
-      return ["Compare ton ordre avec l’ordre correct affiché dans l’interface."];
+      // Feedback is shown in place (vers colorés vert/rouge) — no separate list needed.
+      return [];
     case "quiz":
       return Object.values(expectedAnswersOf(submission)).map(
         (expected) => `Réponse attendue : ${expected}`

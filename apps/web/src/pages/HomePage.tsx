@@ -108,14 +108,20 @@ export function HomePage() {
       <section className="panel">
         <div className="panel__header">
           <h2>M’entraîner</h2>
-          <Link className="button button--ghost" to={`/fables/${slug}`}>
-            Lire le texte
-          </Link>
+          <div className="hero__actions">
+            <Link className="button button--ghost" to={`/fables/${slug}`}>
+              Lire le texte
+            </Link>
+            <Link className="button" to={`/fables/${slug}/practice/${exerciseTypes[0]}`}>
+              Commencer l’entraînement
+            </Link>
+          </div>
         </div>
-        <p>Autant de fois que tu veux, dans l’ordre que tu veux. Rien n’est imposé.</p>
+        <p>Du plus simple au plus exigeant. Suis l’ordre, ou choisis librement — autant de fois que tu veux.</p>
         <div className="cards-grid cards-grid--compact">
-          {exerciseTypes.map((type) => (
-            <Link className="mini-card" key={type} to={`/fables/${slug}/practice/${type}`}>
+          {exerciseTypes.map((type, index) => (
+            <Link className="mini-card mini-card--step" key={type} to={`/fables/${slug}/practice/${type}`}>
+              <span className="step-badge">{index + 1}</span>
               <strong>{exerciseMeta[type].label}</strong>
               <span>{exerciseMeta[type].tagline}</span>
             </Link>

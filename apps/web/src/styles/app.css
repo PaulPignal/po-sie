@@ -451,6 +451,63 @@ pre {
   font-weight: 600;
 }
 
+/* Per-item exercise feedback (green = juste, rouge = à revoir) */
+.field--correct input,
+.field--correct textarea {
+  border-color: var(--green);
+  background: rgba(83, 120, 90, 0.12);
+}
+
+.field--wrong input,
+.field--wrong textarea {
+  border-color: var(--red);
+  background: rgba(181, 75, 63, 0.1);
+}
+
+.answer-reveal {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.answer-reveal strong {
+  color: var(--green);
+}
+
+.reorder-item--correct {
+  border-style: solid;
+  border-color: var(--green);
+}
+
+.reorder-item--wrong {
+  border-style: solid;
+  border-color: var(--red);
+}
+
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Numbered training ladder on the home */
+.mini-card--step {
+  position: relative;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff9f1 !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
 .state-card {
   justify-items: center;
   text-align: center;
